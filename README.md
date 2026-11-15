@@ -27,10 +27,14 @@ Recriação HTML do fluxo V2 revisado no [Figma](https://www.figma.com/design/2z
 
 Todos os dados são fictícios. Pagamentos, documentos e canais de contato são demonstrações: não realizam transações ou enviam mensagens. A apresentação descreve hipóteses de melhoria, não resultados medidos. Estados alternativos são cenários demonstrativos independentes, não dados simultâneos do mesmo cliente.
 
-Sem dependências de execução, fontes e logo locais. Fontes Inter e Poppins com licenças em `assets/fonts/`. A publicação usa GitHub Pages na branch `main`, pasta raiz. O projeto original do grupo permanece separado.
+Sem dependências de execução, fontes e logo locais. Fontes locais com licenças em `assets/fonts/`. A publicação usa GitHub Pages na branch `main`, pasta raiz. O projeto original do grupo permanece separado.
 
 ## Arquivos
 
 - `index.html`, `presentation.css`, `presentation.js`: apresentação, roteiro e controles.
 - `app/`: aplicativo demonstrativo com navegação, estados, diálogos e rolagem.
 - `assets/`: logo original e fontes locais.
+
+## Referência tipográfica
+
+A família, os pesos e a escala do app foram conferidos nas camadas do Figma original Bulbe. Veja [medidas e fontes verificadas](TYPOGRAPHY.md).
