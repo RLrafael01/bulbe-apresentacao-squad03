@@ -29,12 +29,13 @@ body{font-size:var(--text-sm);line-height:var(--line-sm);font-synthesis:none}
 
 .invoice-month{font-size:var(--text-sm);line-height:var(--line-sm);font-weight:600}.due-date{font-size:var(--text-xs);line-height:var(--line-xs);font-weight:600}
 
-/* Compact navigation preserves access when the original top bar leaves view. */
-#compact-header{position:fixed;inset:0 0 auto;height:64px;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:0 23px;background:#1308a1;color:#fff;box-shadow:0 3px 12px #09056e20;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 180ms ease,visibility 180ms}
-#compact-header.is-visible{opacity:1;visibility:visible;pointer-events:auto}
-#compact-header button{display:grid;place-items:center;width:44px;height:44px;margin-left:-10px;border:0;border-radius:10px;background:transparent;color:inherit;opacity:0;transform:translateX(-6px);transition:opacity 220ms ease,transform 260ms ease}
-#compact-header img{display:block;width:99px;transform:translateX(var(--compact-logo-start,-116px));transition:transform 320ms cubic-bezier(.22,.68,.2,1)}
-#compact-header.is-visible button{opacity:1;transform:translateX(0)}
-#compact-header.is-visible img{transform:translateX(0)}
+/* One persistent header and logo morph continuously with scroll. */
+#compact-header{--logo-x:-116.5px;--header-y:3px;--header-height:70px;--header-shadow:0;--menu-opacity:1;--back-opacity:0;--avatar-opacity:1;position:fixed;inset:0 0 auto;height:var(--header-height);z-index:10;background:#1308a1;color:#fff;box-shadow:0 3px 12px rgb(9 5 110 / var(--header-shadow));transition:height 380ms cubic-bezier(.22,.68,.2,1),box-shadow 380ms ease}
+#compact-header button{position:absolute;left:13px;top:10px;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:inherit;transform:translateY(var(--header-y));transition:transform 380ms cubic-bezier(.22,.68,.2,1)}
+#compact-header .menu-glyph,#compact-header .back-glyph{grid-area:1/1;display:grid;place-items:center;transition:opacity 280ms ease}
+#compact-header .menu-glyph{opacity:var(--menu-opacity)}
+#compact-header .back-glyph{opacity:var(--back-opacity)}
+#compact-header>img{position:absolute;right:23px;top:18px;display:block;width:99px;transform:translate(var(--logo-x),var(--header-y));transition:transform 420ms cubic-bezier(.22,.68,.2,1);will-change:transform}
+.header-avatar{position:absolute;right:23px;top:15.5px;width:33px;height:33px;border-radius:10px;background:#ffffff20;display:grid;place-items:center;font-size:12px;opacity:var(--avatar-opacity);transform:translateY(var(--header-y));transition:opacity 220ms ease,transform 380ms ease;pointer-events:none}
 #viewport{scroll-padding-top:80px}
-@media(prefers-reduced-motion:reduce){#compact-header,#compact-header button,#compact-header img{transition:none}}
+@media(prefers-reduced-motion:reduce){#compact-header,#compact-header button,#compact-header>img,#compact-header .menu-glyph,#compact-header .back-glyph,.header-avatar{transition:none}}

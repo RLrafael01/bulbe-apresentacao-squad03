@@ -9,7 +9,7 @@ Ordem: Enzo (HU01), Rafael (HU02), Rhuan (HU03), Igor (HU04), Márcio (HU05), Ca
 - Use Anterior/Próxima tela ou as setas do teclado. O roteiro muda a tela e rola até o trecho relevante automaticamente.
 - Cada integrante tem botões de acesso direto às suas telas.
 - Abra “Apoio para apresentar” para consultar uma fala sugerida e a história de referência.
-- Ao rolar além do menu/logo/perfil, uma barra azul fixa mantém a seta de voltar e anima a logo para a direita. Ao subir, o cabeçalho original retorna. A preferência de movimento reduzido desativa a animação.
+- Ao rolar, o mesmo cabeçalho e a mesma logo permanecem na tela: a logo desliza gradualmente para a direita enquanto menu e perfil dão lugar à seta de voltar. Ao subir, o movimento se inverte. A preferência de movimento reduzido desativa a animação.
 - A seta usa o percurso local do app; acessos diretos usam a tela da área ou abrem o menu quando já estão na raiz.
 - O celular é navegável: clicar em outra tela atualiza automaticamente o integrante, a fala e o progresso. A rolagem acompanha os trechos de Economia, Contrato, Serviço, Duas contas e Atendimento.
 - Os comandos do roteiro continuam guiando o app, sem a sincronização manual fechar diálogos ou reposicionar a rolagem.

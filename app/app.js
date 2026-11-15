@@ -28,27 +28,32 @@ const areas=[['contas','Minhas contas','bill'],['economia','Minha economia','cha
 document.querySelector('#menu-items').innerHTML=areas.map(([id,label,ico])=>link(id,label,ico)).join('');
 const viewport=document.querySelector('#viewport');
 const compactHeader=document.querySelector('#compact-header');
-compactHeader.querySelector('button').innerHTML=icon('back');
-let topbar=null,compactThreshold=55,compactVisible=false,navigationTrail=[],navigatingBack=false;
-function setCompactHeader(visible){
- compactVisible=visible;compactHeader.classList.toggle('is-visible',visible);
- compactHeader.inert=!visible;compactHeader.setAttribute('aria-hidden',String(!visible));
- if(topbar){topbar.inert=visible;topbar.setAttribute('aria-hidden',String(visible));}
-}
+const headerButton=compactHeader.querySelector('button');
+headerButton.innerHTML='<span class="menu-glyph" aria-hidden="true">'+icon('menu')+'</span><span class="back-glyph" aria-hidden="true">'+icon('back')+'</span>';
+const headerAvatar=compactHeader.querySelector('.header-avatar');
+let headerInternal=false,headerStartX=-116.5,navigationTrail=[],navigatingBack=false;
 function measureCompactHeader(){
- topbar=viewport.querySelector('.topbar');
- if(!topbar)return;
- compactThreshold=topbar.getBoundingClientRect().bottom-viewport.getBoundingClientRect().top+viewport.scrollTop;
- const logo=topbar.querySelector('img');
+ headerInternal=Boolean(screens[route].internal);
+ // Same logo node stays in place; only its transform changes as we scroll.
+ const originalLeft=viewport.clientWidth/2-51.5;
  const targetLeft=viewport.clientWidth-23-99;
- const originalLeft=logo.getBoundingClientRect().left-viewport.getBoundingClientRect().left;
- compactHeader.style.setProperty('--compact-logo-start',(originalLeft-targetLeft)+'px');
+ headerStartX=headerInternal?0:originalLeft-targetLeft;
+ headerAvatar.setAttribute('aria-hidden',String(headerInternal));
  updateCompactHeader();
 }
 function updateCompactHeader(){
- // Small hysteresis keeps the animation stable near the handover point.
- const next=compactVisible?viewport.scrollTop>compactThreshold-4:viewport.scrollTop>=compactThreshold;
- if(next!==compactVisible)setCompactHeader(next);
+ const progress=Math.max(0,Math.min(1,viewport.scrollTop/110));
+ compactHeader.style.setProperty('--logo-x',(headerStartX*(1-progress))+'px');
+ compactHeader.style.setProperty('--header-y',(3*(1-progress))+'px');
+ compactHeader.style.setProperty('--header-height',(70-6*progress)+'px');
+ compactHeader.style.setProperty('--header-shadow',(progress*.12).toFixed(3));
+ compactHeader.style.setProperty('--menu-opacity',headerInternal?0:Math.max(0,1-progress*2));
+ compactHeader.style.setProperty('--back-opacity',headerInternal?1:Math.max(0,(progress-.25)/.75));
+ compactHeader.style.setProperty('--avatar-opacity',headerInternal?0:Math.max(0,1-progress*2));
+ const back=headerInternal||progress>=.5;
+ headerButton.toggleAttribute('data-back',back);headerButton.toggleAttribute('data-menu',!back);
+ headerButton.setAttribute('aria-label',back?'Voltar':'Abrir menu');
+ headerAvatar.setAttribute('aria-hidden',String(headerInternal||progress>=.5));
 }
 window.addEventListener('resize',measureCompactHeader);
 
@@ -62,7 +67,7 @@ function visibleFocus(){
  if(viewport.scrollTop<=1)return '';
  const bounds=viewport.getBoundingClientRect();
  const atBottom=viewport.scrollTop+viewport.clientHeight>=viewport.scrollHeight-2;
- const covered=compactVisible?compactHeader.offsetHeight:0;
+ const covered=compactHeader.offsetHeight;
  const threshold=covered+(viewport.clientHeight-covered)*(atBottom?.8:.45);
  let focus='';
  for(const id of sectionMap[route]||[]){
@@ -79,7 +84,7 @@ viewport.addEventListener('scroll',()=>{
  clearTimeout(scrollTimer);if(suppressScroll)return;
  scrollTimer=setTimeout(reportVisibleContext,120);
 },{passive:true});
-function render(id,{report=false}={}){setCompactHeader(false);cancelPendingFocus();clearTimeout(scrollTimer);suppressScroll=true;lastContext='';route=screens[id]?id:'economia';const s=screens[route];document.title='Bulbe · '+s.title.replace(/<br>/g,' ');viewport.innerHTML=`<header class="hero ${s.internal?'internal':''}"><svg class="sun" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="115" cy="100" r="66"/><path d="M115 20V3M115 180v17M35 100H18M195 100h15M58 43 46 31M58 157l-12 12M172 43l12-12M172 157l12 12"/></svg><div class="topbar"><button ${s.internal?'data-back':'data-menu'} aria-label="${s.internal?'Voltar':'Abrir menu'}">${icon(s.internal?'back':'menu')}</button><img src="../assets/logo.svg" alt="Bulbe">${s.internal?'':'<span class="avatar" aria-label="Perfil de demonstração">M</span>'}</div><p class="eyebrow">${s.label}</p><h1>${s.title}</h1>${s.subtitle?`<p class="subtitle">${s.subtitle}</p>`:''}<p class="greeting">${s.greeting}</p>${s.internal?'':'<span class="installation">Instalação 3013588579 <span aria-hidden="true">⌄</span></span>'}</header><div class="stack">${s.body()}<p class="disclaimer">Dados fictícios · demonstração acadêmica</p></div>`;
+function render(id,{report=false}={}){cancelPendingFocus();clearTimeout(scrollTimer);suppressScroll=true;lastContext='';route=screens[id]?id:'economia';const s=screens[route];document.title='Bulbe · '+s.title.replace(/<br>/g,' ');viewport.innerHTML=`<header class="hero ${s.internal?'internal':''}"><svg class="sun" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="115" cy="100" r="66"/><path d="M115 20V3M115 180v17M35 100H18M195 100h15M58 43 46 31M58 157l-12 12M172 43l12-12M172 157l12 12"/></svg><div class="topbar" aria-hidden="true"></div><p class="eyebrow">${s.label}</p><h1>${s.title}</h1>${s.subtitle?`<p class="subtitle">${s.subtitle}</p>`:''}<p class="greeting">${s.greeting}</p>${s.internal?'':'<span class="installation">Instalação 3013588579 <span aria-hidden="true">⌄</span></span>'}</header><div class="stack">${s.body()}<p class="disclaimer">Dados fictícios · demonstração acadêmica</p></div>`;
 document.querySelector('#bottom').innerHTML=[['contas','Faturas','bill','faturas'],['economia','Economia','chart','economia'],['contrato','Contrato','contract','contrato'],['atendimento','Ajuda','headset','ajuda']].map(([r,label,ico,area])=>`<a href="#${r}" data-area="${area}" ${s.area===area?'aria-current="page"':''}>${icon(ico)}<span>${label}</span></a>`).join('');viewport.scrollTo({top:0,behavior:'instant'});document.querySelector('#menu').close();measureCompactHeader();if(report)reportContext('');}
 function navigate(id){if(location.hash==='#'+id)render(id,{report:true});else location.hash=id;}
 function goBack(){
