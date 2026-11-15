@@ -47,3 +47,8 @@ async function fullscreen(){try{if(document.fullscreenElement)await document.exi
 $('#fullscreen').onclick=fullscreen;document.addEventListener('fullscreenchange',()=>{$('#fullscreen').textContent=document.fullscreenElement?'Sair da tela cheia ↙':'Tela cheia ↗';sizePhone();});
 function key(e){if(e.altKey||e.ctrlKey||e.metaKey||/INPUT|TEXTAREA|SELECT/.test(e.target?.tagName))return;if(!$('#finish').hidden){if(e.key==='Escape')$('#back-finish').click();return;}if(e.key==='ArrowRight'){e.preventDefault?.();next();}if(e.key==='ArrowLeft'){e.preventDefault?.();previous();}if(e.key?.toLowerCase()==='f')fullscreen();}
 document.addEventListener('keydown',key);window.addEventListener('hashchange',parse);window.addEventListener('resize',sizePhone);window.addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==app.contentWindow)return;if(e.data?.type==='bulbe:ready'){ready=true;showApp();}if(e.data?.type==='bulbe:route')$('#resume').hidden=e.data.route===stages[stageIndex].scenes[sceneIndex].route;if(e.data?.type==='bulbe:key')key({key:e.data.key});});sizePhone();parse();
+
+// Synchronize even if the iframe's ready message arrives before this script.
+function synchronizeLoadedApp(){ready=true;showApp();}
+app.addEventListener('load',synchronizeLoadedApp);
+if(document.readyState==='complete')synchronizeLoadedApp();else window.addEventListener('load',synchronizeLoadedApp,{once:true});
