@@ -26,13 +26,58 @@ const screens={
 };
 const areas=[['contas','Minhas contas','bill'],['economia','Minha economia','chart'],['contrato','Minha contratação','contract'],['servico','Como funciona a Bulbe','solar'],['duas-contas','Entenda suas contas','bill'],['atendimento','Atendimento','headset'],['indicacao','Indique e ganhe','gift']];
 document.querySelector('#menu-items').innerHTML=areas.map(([id,label,ico])=>link(id,label,ico)).join('');
-const viewport=document.querySelector('#viewport');let route='economia';
-function render(id){route=screens[id]?id:'economia';const s=screens[route];document.title='Bulbe · '+s.title.replace(/<br>/g,' ');viewport.innerHTML=`<header class="hero ${s.internal?'internal':''}"><svg class="sun" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="115" cy="100" r="66"/><path d="M115 20V3M115 180v17M35 100H18M195 100h15M58 43 46 31M58 157l-12 12M172 43l12-12M172 157l12 12"/></svg><div class="topbar"><button ${s.internal?'data-back':'data-menu'} aria-label="${s.internal?'Voltar':'Abrir menu'}">${icon(s.internal?'back':'menu')}</button><img src="../assets/logo.svg" alt="Bulbe">${s.internal?'':'<span class="avatar" aria-label="Perfil de demonstração">M</span>'}</div><p class="eyebrow">${s.label}</p><h1>${s.title}</h1>${s.subtitle?`<p class="subtitle">${s.subtitle}</p>`:''}<p class="greeting">${s.greeting}</p>${s.internal?'':'<span class="installation">Instalação 3013588579 <span aria-hidden="true">⌄</span></span>'}</header><div class="stack">${s.body()}<p class="disclaimer">Dados fictícios · demonstração acadêmica</p></div>`;
-document.querySelector('#bottom').innerHTML=[['contas','Faturas','bill','faturas'],['economia','Economia','chart','economia'],['contrato','Contrato','contract','contrato'],['atendimento','Ajuda','headset','ajuda']].map(([r,label,ico,area])=>`<a href="#${r}" data-area="${area}" ${s.area===area?'aria-current="page"':''}>${icon(ico)}<span>${label}</span></a>`).join('');viewport.scrollTo({top:0,behavior:'instant'});document.querySelector('#menu').close();parent.postMessage({type:'bulbe:route',route},location.origin);}
-function navigate(id){if(location.hash==='#'+id)render(id);else location.hash=id;}
+const viewport=document.querySelector('#viewport');
+let route='economia',sectionMap={},scrollTimer=0,focusFrame=0,suppressScroll=true,lastContext='';
+function cancelPendingFocus(){if(focusFrame)cancelAnimationFrame(focusFrame);focusFrame=0;}
+function reportContext(focus=''){
+ const key=route+'|'+focus;if(key===lastContext)return;
+ lastContext=key;parent.postMessage({type:'bulbe:context',route,focus},location.origin);
+}
+function visibleFocus(){
+ if(viewport.scrollTop<=1)return '';
+ const bounds=viewport.getBoundingClientRect();
+ const atBottom=viewport.scrollTop+viewport.clientHeight>=viewport.scrollHeight-2;
+ const threshold=viewport.clientHeight*(atBottom?.8:.45);
+ let focus='';
+ for(const id of sectionMap[route]||[]){
+  const section=document.getElementById(id);if(!section)continue;
+  if(section.getBoundingClientRect().top-bounds.top<=threshold)focus=id;
+ }
+ return focus;
+}
+function reportVisibleContext(){if(!suppressScroll)reportContext(visibleFocus());}
+function beginManualInteraction(){cancelPendingFocus();suppressScroll=false;}
+for(const event of ['wheel','touchstart','pointerdown','keydown'])document.addEventListener(event,beginManualInteraction,{capture:true,passive:true});
+viewport.addEventListener('scroll',()=>{
+ clearTimeout(scrollTimer);if(suppressScroll)return;
+ scrollTimer=setTimeout(reportVisibleContext,120);
+},{passive:true});
+function render(id,{report=false}={}){cancelPendingFocus();clearTimeout(scrollTimer);suppressScroll=true;lastContext='';route=screens[id]?id:'economia';const s=screens[route];document.title='Bulbe · '+s.title.replace(/<br>/g,' ');viewport.innerHTML=`<header class="hero ${s.internal?'internal':''}"><svg class="sun" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="115" cy="100" r="66"/><path d="M115 20V3M115 180v17M35 100H18M195 100h15M58 43 46 31M58 157l-12 12M172 43l12-12M172 157l12 12"/></svg><div class="topbar"><button ${s.internal?'data-back':'data-menu'} aria-label="${s.internal?'Voltar':'Abrir menu'}">${icon(s.internal?'back':'menu')}</button><img src="../assets/logo.svg" alt="Bulbe">${s.internal?'':'<span class="avatar" aria-label="Perfil de demonstração">M</span>'}</div><p class="eyebrow">${s.label}</p><h1>${s.title}</h1>${s.subtitle?`<p class="subtitle">${s.subtitle}</p>`:''}<p class="greeting">${s.greeting}</p>${s.internal?'':'<span class="installation">Instalação 3013588579 <span aria-hidden="true">⌄</span></span>'}</header><div class="stack">${s.body()}<p class="disclaimer">Dados fictícios · demonstração acadêmica</p></div>`;
+document.querySelector('#bottom').innerHTML=[['contas','Faturas','bill','faturas'],['economia','Economia','chart','economia'],['contrato','Contrato','contract','contrato'],['atendimento','Ajuda','headset','ajuda']].map(([r,label,ico,area])=>`<a href="#${r}" data-area="${area}" ${s.area===area?'aria-current="page"':''}>${icon(ico)}<span>${label}</span></a>`).join('');viewport.scrollTo({top:0,behavior:'instant'});document.querySelector('#menu').close();if(report)reportContext('');}
+function navigate(id){if(location.hash==='#'+id)render(id,{report:true});else location.hash=id;}
 const notices={pix:['Pagamento de demonstração','O protótipo permite consultar a fatura, mas não gera Pix nem realiza pagamentos.'],boleto:['Boleto de demonstração','Nenhum boleto real é emitido nesta apresentação.'],contrato:['Documento ainda não disponível','O contrato não está anexado ao protótipo. A interface orienta solicitar o documento ao atendimento.'],canais:['Canal de demonstração','Esta ação ilustra o acesso ao atendimento. Não envia mensagens nem liga para números reais.'],consulta:['Consulta indisponível','O pedido continua registrado. Neste cenário demonstrativo, o andamento não está disponível.']};
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-menu'))document.querySelector('#menu').showModal();if(b.hasAttribute('data-close'))b.closest('dialog').close();if(b.hasAttribute('data-back'))navigate(screens[route].area==='ajuda'?'atendimento':screens[route].area==='economia'?'economia':'contas');if(b.dataset.notice){const [title,copy]=notices[b.dataset.notice];document.querySelector('#notice-title').textContent=title;document.querySelector('#notice-copy').textContent=copy;document.querySelector('#notice').showModal();}});
-window.addEventListener('hashchange',()=>render(location.hash.slice(1)));
-window.addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==parent)return;const d=e.data;if(d?.type==='bulbe:show'){for(const dialog of document.querySelectorAll('dialog'))dialog.close();window.history.replaceState(null,'','#'+d.route);render(d.route);requestAnimationFrame(()=>{const target=d.focus&&document.getElementById(d.focus);if(target)viewport.scrollTo({top:target.offsetTop+target.parentElement.offsetTop-15,behavior:'instant'});});}if(d?.type==='bulbe:scroll')viewport.scrollBy({top:d.amount,behavior:'smooth'});});
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-menu'))document.querySelector('#menu').showModal();if(b.hasAttribute('data-close'))b.closest('dialog').close();if(b.hasAttribute('data-back'))navigate(screens[route].area==='ajuda'?'atendimento':screens[route].area==='economia'?'economia':'contas');if(b.dataset.notice){const section=b.closest('section[id]');reportContext(section&&(sectionMap[route]||[]).includes(section.id)?section.id:visibleFocus());const [title,copy]=notices[b.dataset.notice];document.querySelector('#notice-title').textContent=title;document.querySelector('#notice-copy').textContent=copy;document.querySelector('#notice').showModal();}});
+window.addEventListener('hashchange',()=>render(location.hash.slice(1),{report:true}));
+window.addEventListener('message',e=>{
+ if(e.origin!==location.origin||e.source!==parent)return;
+ const d=e.data;
+ if(d?.type==='bulbe:show'&&typeof d.route==='string'&&Object.hasOwn(screens,d.route)){
+  if(d.sections&&typeof d.sections==='object')sectionMap=Object.fromEntries(Object.entries(d.sections).filter(([id,ids])=>Object.hasOwn(screens,id)&&Array.isArray(ids)).map(([id,ids])=>[id,ids.filter(value=>typeof value==='string'&&value)]));
+  for(const dialog of document.querySelectorAll('dialog'))dialog.close();
+  window.history.replaceState(null,'','#'+d.route);
+  render(d.route,{report:false});
+  const focus=typeof d.focus==='string'?d.focus:'';
+  lastContext=route+'|'+focus;
+  focusFrame=requestAnimationFrame(()=>{
+   focusFrame=0;
+   const target=focus&&document.getElementById(focus);
+   if(target)viewport.scrollTo({top:viewport.scrollTop+target.getBoundingClientRect().top-viewport.getBoundingClientRect().top-15,behavior:'instant'});
+  });
+ }
+ if(d?.type==='bulbe:scroll'&&Number.isFinite(d.amount)){
+  beginManualInteraction();viewport.scrollBy({top:d.amount,behavior:'smooth'});
+  clearTimeout(scrollTimer);scrollTimer=setTimeout(reportVisibleContext,120);
+ }
+});
 render(location.hash.slice(1));parent.postMessage({type:'bulbe:ready'},location.origin);
 document.addEventListener('keydown',e=>{if(['ArrowRight','ArrowLeft'].includes(e.key)&&!document.querySelector('dialog[open]')&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){e.preventDefault();parent.postMessage({type:'bulbe:key',key:e.key},location.origin);}});

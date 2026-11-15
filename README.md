@@ -9,7 +9,10 @@ Ordem: Enzo (HU01), Rafael (HU02), Rhuan (HU03), Igor (HU04), Márcio (HU05), Ca
 - Use Anterior/Próxima tela ou as setas do teclado. O roteiro muda a tela e rola até o trecho relevante automaticamente.
 - Cada integrante tem botões de acesso direto às suas telas.
 - Abra “Apoio para apresentar” para consultar uma fala sugerida e a história de referência.
-- O celular é navegável. Após explorar outra tela, use “Retomar a tela do roteiro”.
+- O celular é navegável: clicar em outra tela atualiza automaticamente o integrante, a fala e o progresso. A rolagem acompanha os trechos de Economia, Contrato, Serviço, Duas contas e Atendimento.
+- Os comandos do roteiro continuam guiando o app, sem a sincronização manual fechar diálogos ou reposicionar a rolagem.
+- Indicações recebe uma explicação complementar, fora das seis user stories; “Voltar ao roteiro” retoma o último momento.
+- Na etapa do Enzo, “Observação visual · menu e identidade” explica discretamente as escolhas de navegação e estilo.
 - A tecla F ou o botão superior ativa tela cheia quando o navegador permite.
 - Links com hash preservam a etapa e o momento ao atualizar a página.
 
