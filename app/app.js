@@ -31,7 +31,7 @@ const compactHeader=document.querySelector('#compact-header');
 const headerButton=compactHeader.querySelector('button');
 headerButton.innerHTML='<span class="menu-glyph" aria-hidden="true">'+icon('menu')+'</span><span class="back-glyph" aria-hidden="true">'+icon('back')+'</span>';
 const headerAvatar=compactHeader.querySelector('.header-avatar');
-let headerInternal=false,headerStartX=-116.5,navigationTrail=[],navigatingBack=false;
+let headerInternal=false,headerCollapsed=false,headerStartX=-116.5,navigationTrail=[],navigatingBack=false;
 function measureCompactHeader(){
  headerInternal=Boolean(screens[route].internal);
  // Same logo node stays in place; only its transform changes as we scroll.
@@ -42,18 +42,20 @@ function measureCompactHeader(){
  updateCompactHeader();
 }
 function updateCompactHeader(){
- const progress=Math.max(0,Math.min(1,viewport.scrollTop/110));
+ // Trigger a complete animation; separate thresholds prevent flickering near the switch.
+ headerCollapsed=viewport.scrollTop>=(headerCollapsed?24:56);
+ const progress=headerCollapsed?1:0;
  compactHeader.style.setProperty('--logo-x',(headerStartX*(1-progress))+'px');
  compactHeader.style.setProperty('--header-y',(3*(1-progress))+'px');
  compactHeader.style.setProperty('--header-height',(70-6*progress)+'px');
  compactHeader.style.setProperty('--header-shadow',(progress*.12).toFixed(3));
- compactHeader.style.setProperty('--menu-opacity',headerInternal?0:Math.max(0,1-progress*2));
- compactHeader.style.setProperty('--back-opacity',headerInternal?1:Math.max(0,(progress-.25)/.75));
- compactHeader.style.setProperty('--avatar-opacity',headerInternal?0:Math.max(0,1-progress*2));
- const back=headerInternal||progress>=.5;
+ compactHeader.style.setProperty('--menu-opacity',headerInternal?0:1-progress);
+ compactHeader.style.setProperty('--back-opacity',headerInternal?1:progress);
+ compactHeader.style.setProperty('--avatar-opacity',headerInternal?0:1-progress);
+ const back=headerInternal||headerCollapsed;
  headerButton.toggleAttribute('data-back',back);headerButton.toggleAttribute('data-menu',!back);
  headerButton.setAttribute('aria-label',back?'Voltar':'Abrir menu');
- headerAvatar.setAttribute('aria-hidden',String(headerInternal||progress>=.5));
+ headerAvatar.setAttribute('aria-hidden',String(back));
 }
 window.addEventListener('resize',measureCompactHeader);
 

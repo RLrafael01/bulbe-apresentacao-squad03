@@ -29,7 +29,7 @@ body{font-size:var(--text-sm);line-height:var(--line-sm);font-synthesis:none}
 
 .invoice-month{font-size:var(--text-sm);line-height:var(--line-sm);font-weight:600}.due-date{font-size:var(--text-xs);line-height:var(--line-xs);font-weight:600}
 
-/* One persistent header and logo morph continuously with scroll. */
+/* One persistent header and logo animate fully between expanded and compact states. */
 #compact-header{--logo-x:-116.5px;--header-y:3px;--header-height:70px;--header-shadow:0;--menu-opacity:1;--back-opacity:0;--avatar-opacity:1;position:fixed;inset:0 0 auto;height:var(--header-height);z-index:10;background:#1308a1;color:#fff;box-shadow:0 3px 12px rgb(9 5 110 / var(--header-shadow));transition:height 380ms cubic-bezier(.22,.68,.2,1),box-shadow 380ms ease}
 #compact-header button{position:absolute;left:13px;top:10px;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:inherit;transform:translateY(var(--header-y));transition:transform 380ms cubic-bezier(.22,.68,.2,1)}
 #compact-header .menu-glyph,#compact-header .back-glyph{grid-area:1/1;display:grid;place-items:center;transition:opacity 280ms ease}
