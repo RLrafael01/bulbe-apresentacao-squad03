@@ -28,3 +28,13 @@ body{font-size:var(--text-sm);line-height:var(--line-sm);font-synthesis:none}
 .drawer-top h2{line-height:34px;letter-spacing:-.02em}
 
 .invoice-month{font-size:var(--text-sm);line-height:var(--line-sm);font-weight:600}.due-date{font-size:var(--text-xs);line-height:var(--line-xs);font-weight:600}
+
+/* Compact navigation preserves access when the original top bar leaves view. */
+#compact-header{position:fixed;inset:0 0 auto;height:64px;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:0 23px;background:#1308a1;color:#fff;box-shadow:0 3px 12px #09056e20;opacity:0;visibility:hidden;pointer-events:none;transition:opacity 180ms ease,visibility 180ms}
+#compact-header.is-visible{opacity:1;visibility:visible;pointer-events:auto}
+#compact-header button{display:grid;place-items:center;width:44px;height:44px;margin-left:-10px;border:0;border-radius:10px;background:transparent;color:inherit;opacity:0;transform:translateX(-6px);transition:opacity 220ms ease,transform 260ms ease}
+#compact-header img{display:block;width:99px;transform:translateX(var(--compact-logo-start,-116px));transition:transform 320ms cubic-bezier(.22,.68,.2,1)}
+#compact-header.is-visible button{opacity:1;transform:translateX(0)}
+#compact-header.is-visible img{transform:translateX(0)}
+#viewport{scroll-padding-top:80px}
+@media(prefers-reduced-motion:reduce){#compact-header,#compact-header button,#compact-header img{transition:none}}
